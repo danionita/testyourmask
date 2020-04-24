@@ -27,7 +27,11 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   static const platform = const MethodChannel('com.rocinante.tym/battery');
+
+
   String _batteryLevel = 'Unknown battery level.';
+
+  String _sensorValues = "Unkown sensor values";
 
   Future<void> _getBatteryLevel() async {
     String batteryLevel;
@@ -43,6 +47,22 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  Future<void> _getSensorValues() async {
+    var result;
+    String sensorValues;
+    try {
+      result = await platform.invokeMethod('getSensorValue');
+      sensorValues = 'Sensor at $result % .';
+
+    } on PlatformException catch (e) {
+      result = "Failed to get sensor values: '${e.message}'.";
+    }
+
+    setState(() {
+      _sensorValues = sensorValues;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Material(
@@ -50,7 +70,8 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            CircleAvatar(radius: 50,
+            CircleAvatar(
+              radius: 50,
               backgroundImage: NetworkImage(
                   'https://i.pinimg.com/236x/83/13/bb/8313bbedf58b9576f36de321c96db50f.jpg'),
             ),
@@ -59,6 +80,11 @@ class _MyHomePageState extends State<MyHomePage> {
               onPressed: _getBatteryLevel,
             ),
             Text(_batteryLevel),
+            RaisedButton(
+              child: Text('Get Sensor Values'),
+              onPressed: _getSensorValues,
+            ),
+            Text(_sensorValues),
           ],
         ),
       ),
