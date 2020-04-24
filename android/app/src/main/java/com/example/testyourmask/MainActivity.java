@@ -1,15 +1,10 @@
 package com.example.testyourmask;
 
-import androidx.annotation.NonNull;
-
-import io.flutter.embedding.android.FlutterActivity;
-import io.flutter.embedding.engine.FlutterEngine;
-import io.flutter.plugin.common.MethodChannel;
-import io.flutter.plugins.GeneratedPluginRegistrant;
-
+import android.Manifest;
 import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -19,51 +14,61 @@ import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
+import com.samsung.android.sdk.SsdkUnsupportedException;
+import com.samsung.android.sdk.sensorextension.Ssensor;
+import com.samsung.android.sdk.sensorextension.SsensorEvent;
+import com.samsung.android.sdk.sensorextension.SsensorEventListener;
+import com.samsung.android.sdk.sensorextension.SsensorExtension;
+import com.samsung.android.sdk.sensorextension.SsensorManager;
+
 import java.util.Arrays;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+
+import io.flutter.embedding.android.FlutterActivity;
+import io.flutter.embedding.engine.FlutterEngine;
+import io.flutter.plugin.common.MethodChannel;
+import io.flutter.plugins.GeneratedPluginRegistrant;
 
 public class MainActivity extends FlutterActivity {
     private static final String CHANNEL = "com.rocinante.tym/battery";
+    Map<String, String> sensorToValues = new HashMap<>();
 
-    SensorManager sm = null;
-    private List<Sensor> list;
-    float[] values = null;
-    SensorEventListener sel = new SensorEventListener() {
-        public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
-        }
-
-        public void onSensorChanged(SensorEvent event) {
-            values = event.values;
-            String msg = "PPG " + (int) event.values[0];
-            System.out.println(msg);
-        }
-    };
-//
-//    @Override
-//    public void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//        sm = (SensorManager) getSystemService(SENSOR_SERVICE);
-//
-//        List<Sensor> allSensors = sm.getSensorList(Sensor.TYPE_ALL);
-//        System.out.println(allSensors);
-//
-//        Sensor hrmLedIr = sm.getDefaultSensor(65571);
-//        Sensor hrmLedRed = sm.getDefaultSensor(65572);
-//        Sensor hrmSensor = sm.getDefaultSensor(65562);
-//        Sensor hrSensor = sm.getDefaultSensor(21);
-//        list = Arrays.asList(hrmLedIr, hrmLedRed, hrmSensor, hrSensor);
-//
-//        for (Sensor s : list) {
-//            sm.registerListener(sel, s, SensorManager.SENSOR_DELAY_FASTEST);
-//        }
-//    }
 
     @Override
-    protected void onStop() {
-        if (list.size() > 0) {
-            sm.unregisterListener(sel);
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        SsensorExtension ssensorExtension = new SsensorExtension();
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.BODY_SENSORS)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.BODY_SENSORS},
+                    1);
         }
+
+        try {
+            ssensorExtension.initialize(this);
+        } catch (SsdkUnsupportedException e) {
+            e.printStackTrace();
+        }
+        SsensorManager ssensorManager = new SsensorManager(this, ssensorExtension);
+        Ssensor hrmIr = ssensorManager.getDefaultSensor(SsensorExtension.TYPE_HRM_LED_IR);
+//        Ssensor hrmGreen = ssensorManager.getDefaultSensor(SsensorExtension.TYPE_HRM_LED_GREEN);
+        Ssensor hrmRed = ssensorManager.getDefaultSensor(SsensorExtension.TYPE_HRM_LED_RED);
+//        Ssensor hrmBlue = ssensorManager.getDefaultSensor(SsensorExtension.TYPE_HRM_LED_BLUE);
+        ssensorManager.registerListener(ssensorEventListener, hrmIr, SensorManager.SENSOR_DELAY_NORMAL);
+        ssensorManager.registerListener(ssensorEventListener, hrmRed, SensorManager.SENSOR_DELAY_NORMAL);
+    }
+
+    @Override
+    protected void onStop() { //TODO stop sensors
+//        if (list.size() > 0) {
+//            sm.unregisterListener(sel);
+//        }
         super.onStop();
     }
 
@@ -84,8 +89,8 @@ public class MainActivity extends FlutterActivity {
                                     result.error("UNAVAILABLE", "Battery level not available.", null);
                                 }
                             } else if (call.method.equals("getSensorValue")) {
-                                if (values != null) {
-                                    result.success(Arrays.toString(values));
+                                if (sensorToValues != null) {
+                                    result.success(sensorToValues.toString());
                                 } else {
                                     result.error("UNAVAILABLE", "NO VALUES available.", null);
                                 }
@@ -111,27 +116,48 @@ public class MainActivity extends FlutterActivity {
     }
 
 
+//    SensorEventListener accelerometerListener = new SensorEventListener() {
+//        public void onAccuracyChanged(Sensor sensor, int accuracy) {
+//        }
+//
+//        public void onSensorChanged(SensorEvent event) {
+//            values = event.values;
+//        }
+//    };
+//
+//    @Override
+//    public void onCreate(Bundle savedInstanceState) {
+//        super.onCreate(savedInstanceState);
+//        sm = (SensorManager) getSystemService(SENSOR_SERVICE);
+//        list = sm.getSensorList(Sensor.TYPE_ACCELEROMETER);
+//        if (list.size() > 0) {
+//            sm.registerListener(accelerometerListener, list.get(0), SensorManager.SENSOR_DELAY_NORMAL);
+//        }
+//    }
 
-
-
-
-    SensorEventListener accelerometerListener = new SensorEventListener() {
-        public void onAccuracyChanged(Sensor sensor, int accuracy) {
+    SsensorEventListener ssensorEventListener = new SsensorEventListener() {
+        @Override
+        public void OnSensorChanged(SsensorEvent ssensorEvent) {
+            Ssensor sensor = ssensorEvent.sensor;
+            switch (sensor.getType()) {
+                case Ssensor.TYPE_HRM_LED_IR: {
+                    sensorToValues.put("LED_IR: ", Arrays.toString(ssensorEvent.values));
+                    break;
+                }
+                case Ssensor.TYPE_HRM_LED_RED: {
+                    sensorToValues.put("LED_RED: ", Arrays.toString(ssensorEvent.values));
+                    break;
+                }
+                default: {
+                    System.out.println("SSS");
+                    break;
+                }
+            }
         }
 
-        public void onSensorChanged(SensorEvent event) {
-            values = event.values;
+        @Override
+        public void OnAccuracyChanged(Ssensor ssensor, int i) {
+
         }
     };
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        sm = (SensorManager) getSystemService(SENSOR_SERVICE);
-        list = sm.getSensorList(Sensor.TYPE_ACCELEROMETER);
-        if (list.size() > 0) {
-            sm.registerListener(accelerometerListener, list.get(0), SensorManager.SENSOR_DELAY_NORMAL);
-        }
-    }
-
 }
