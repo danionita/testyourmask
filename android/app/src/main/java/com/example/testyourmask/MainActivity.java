@@ -1,22 +1,15 @@
 package com.example.testyourmask;
 
 import android.Manifest;
-import android.content.ContextWrapper;
-import android.content.Intent;
-import android.content.IntentFilter;
+import android.content.Context;
 import android.content.pm.PackageManager;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.os.BatteryManager;
-import android.os.Build.VERSION;
-import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 
 import com.samsung.android.sdk.SsdkUnsupportedException;
 import com.samsung.android.sdk.sensorextension.Ssensor;
@@ -25,8 +18,12 @@ import com.samsung.android.sdk.sensorextension.SsensorEventListener;
 import com.samsung.android.sdk.sensorextension.SsensorExtension;
 import com.samsung.android.sdk.sensorextension.SsensorManager;
 
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import io.flutter.embedding.android.FlutterActivity;
@@ -37,6 +34,8 @@ import io.flutter.plugins.GeneratedPluginRegistrant;
 public class MainActivity extends FlutterActivity {
     private static final String CHANNEL = "com.rocinante.tym/battery";
     Map<String, String> sensorToValues = new HashMap<>();
+    List<String> hrmIrValues;
+    List<String> hrmRedValues;
 
 
     @Override
@@ -62,6 +61,8 @@ public class MainActivity extends FlutterActivity {
 //        Ssensor hrmBlue = ssensorManager.getDefaultSensor(SsensorExtension.TYPE_HRM_LED_BLUE);
         ssensorManager.registerListener(ssensorEventListener, hrmIr, SensorManager.SENSOR_DELAY_NORMAL);
         ssensorManager.registerListener(ssensorEventListener, hrmRed, SensorManager.SENSOR_DELAY_NORMAL);
+        hrmIrValues = new ArrayList<>();
+        hrmRedValues = new ArrayList<>();
     }
 
     @Override
@@ -80,17 +81,14 @@ public class MainActivity extends FlutterActivity {
                 .setMethodCallHandler(
                         (call, result) -> {
                             // Note: this method is invoked on the main thread.
-                            if (call.method.equals("getBatteryLevel")) {
-                                int batteryLevel = getBatteryLevel();
-
-                                if (batteryLevel != -1) {
-                                    result.success(batteryLevel);
-                                } else {
-                                    result.error("UNAVAILABLE", "Battery level not available.", null);
-                                }
-                            } else if (call.method.equals("getSensorValue")) {
+                            if (call.method.equals("getSensorValue")) {
                                 if (sensorToValues != null) {
-                                    result.success(sensorToValues.toString());
+                                    sensorToValues.put("LED_IR: ", hrmIrValues.toString());
+                                    sensorToValues.put("LED_RED: ", hrmRedValues.toString());
+                                    String result1 = sensorToValues.toString();
+                                    writeToFile(result1);
+                                    System.out.println("===> " + result1);
+                                    result.success(result1);
                                 } else {
                                     result.error("UNAVAILABLE", "NO VALUES available.", null);
                                 }
@@ -101,50 +99,18 @@ public class MainActivity extends FlutterActivity {
                 );
     }
 
-    private int getBatteryLevel() {
-        int batteryLevel = -1;
-        if (VERSION.SDK_INT >= VERSION_CODES.LOLLIPOP) {
-            BatteryManager batteryManager = (BatteryManager) getSystemService(BATTERY_SERVICE);
-            batteryLevel = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);
-        } else {
-            Intent intent = new ContextWrapper(getApplicationContext()).
-                    registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
-            batteryLevel = (intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) * 100) /
-                    intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
-        }
-        return batteryLevel;
-    }
-
-
-//    SensorEventListener accelerometerListener = new SensorEventListener() {
-//        public void onAccuracyChanged(Sensor sensor, int accuracy) {
-//        }
-//
-//        public void onSensorChanged(SensorEvent event) {
-//            values = event.values;
-//        }
-//    };
-//
-//    @Override
-//    public void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//        sm = (SensorManager) getSystemService(SENSOR_SERVICE);
-//        list = sm.getSensorList(Sensor.TYPE_ACCELEROMETER);
-//        if (list.size() > 0) {
-//            sm.registerListener(accelerometerListener, list.get(0), SensorManager.SENSOR_DELAY_NORMAL);
-//        }
-//    }
-
     SsensorEventListener ssensorEventListener = new SsensorEventListener() {
         @Override
         public void OnSensorChanged(SsensorEvent ssensorEvent) {
             Ssensor sensor = ssensorEvent.sensor;
             switch (sensor.getType()) {
                 case Ssensor.TYPE_HRM_LED_IR: {
+                    hrmIrValues.add(String.valueOf(ssensorEvent.values[0]));
                     sensorToValues.put("LED_IR: ", Arrays.toString(ssensorEvent.values));
                     break;
                 }
                 case Ssensor.TYPE_HRM_LED_RED: {
+                    hrmRedValues.add(String.valueOf(ssensorEvent.values[0]));
                     sensorToValues.put("LED_RED: ", Arrays.toString(ssensorEvent.values));
                     break;
                 }
@@ -160,4 +126,16 @@ public class MainActivity extends FlutterActivity {
 
         }
     };
+
+    private void writeToFile(String data) {
+        try {
+            Context context = this.getApplicationContext();
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput("data.txt", Context.MODE_PRIVATE));
+            outputStreamWriter.write(data);
+            outputStreamWriter.close();
+        }
+        catch (IOException e) {
+            System.out.println("Exception: File write failed: " + e.toString());
+        }
+    }
 }
