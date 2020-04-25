@@ -78,7 +78,7 @@ public class MainActivity extends FlutterActivity {
                     if (call.method.equals("fetchValues")) {
                         hrmIrValues = new ArrayList<>();
                         hrmRedValues = new ArrayList<>();
-                        counter = 50;
+                        counter = 500;
                         result.success(counter);
                     } else if (call.method.equals("getSensorValue")) {
                         if (hrmRedValues != null && hrmIrValues != null) {
