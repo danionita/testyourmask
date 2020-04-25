@@ -36,6 +36,7 @@ public class MainActivity extends FlutterActivity {
     Map<String, String> sensorToValues = new HashMap<>();
     List<String> hrmIrValues;
     List<String> hrmRedValues;
+    int counter;
 
 
     @Override
@@ -84,6 +85,7 @@ public class MainActivity extends FlutterActivity {
                                 hrmIrValues.add("Starting Now");
                                 hrmRedValues = new ArrayList<>();
                                 hrmRedValues.add("Starting now");
+                                counter = 50;
                             }
                             if (call.method.equals("getSensorValue")) {
                                 if (sensorToValues != null) {
@@ -106,16 +108,17 @@ public class MainActivity extends FlutterActivity {
     SsensorEventListener ssensorEventListener = new SsensorEventListener() {
         @Override
         public void OnSensorChanged(SsensorEvent ssensorEvent) {
+
             Ssensor sensor = ssensorEvent.sensor;
             switch (sensor.getType()) {
                 case Ssensor.TYPE_HRM_LED_IR: {
-                    if (hrmIrValues != null) {
+                    if (hrmIrValues != null && hrmIrValues.size() <= counter) {
                         hrmIrValues.add(String.valueOf(ssensorEvent.values[0]));
                     }
                     break;
                 }
                 case Ssensor.TYPE_HRM_LED_RED: {
-                    if (hrmRedValues != null) {
+                    if (hrmRedValues != null && hrmRedValues.size() <= counter) {
                         hrmRedValues.add(String.valueOf(ssensorEvent.values[0]));
                     }
                     break;
@@ -125,6 +128,7 @@ public class MainActivity extends FlutterActivity {
                     break;
                 }
             }
+
         }
 
         @Override
