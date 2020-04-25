@@ -37,6 +37,7 @@ public class MainActivity extends FlutterActivity {
     List<String> hrmIrValues;
     List<String> hrmRedValues;
     int counter;
+    boolean record;
     long startTimeIR;
     long startTimeRED;
 
@@ -86,14 +87,13 @@ public class MainActivity extends FlutterActivity {
                                 hrmIrValues = new ArrayList<>();
                                 hrmRedValues = new ArrayList<>();
                                 counter = 50;
+                                record = true;
 //                                startTimeIR = System.currentTimeMillis();
 //                                startTimeRED = System.currentTimeMillis();
                             }
                             if (call.method.equals("getSensorValue")) {
                                 if (hrmRedValues != null && hrmIrValues != null) {
-                                    String data = "LED_RED, " + getSubstring(hrmRedValues.toString()) + '\n' + "LED_IR, " + getSubstring(hrmIrValues.toString());
-                                    writeToFile(data);
-                                    System.out.println(data);
+                                    String data = "LED_IR, " + getSubstring(hrmIrValues.toString()) + "\n" + "LED_RED, " + getSubstring(hrmRedValues.toString());
                                     result.success(data);
                                 } else {
                                     result.error("UNAVAILABLE", "NO VALUES available.", null);
@@ -119,12 +119,24 @@ public class MainActivity extends FlutterActivity {
                 case Ssensor.TYPE_HRM_LED_IR: {
                     if (hrmIrValues != null && hrmIrValues.size() <= counter) {
                         hrmIrValues.add(String.valueOf(ssensorEvent.values[0]));
+                    }               
+                    else if(hrmRedValues != null && hrmRedValues.size() > counter && hrmIrValues != null && hrmIrValues.size() > counter){
+                        String data = "LED_IR, " + getSubstring(hrmIrValues.toString()) + "\n" + "LED_RED, " + getSubstring(hrmRedValues.toString());
+                        writeToFile(data,"recording.csv");
+                        System.out.println(data);
+                        record = false;
                     }
                     break;
                 }
                 case Ssensor.TYPE_HRM_LED_RED: {
-                    if (hrmRedValues != null && hrmRedValues.size() <= counter) {
+                    if (hrmRedValues != null && hrmRedValues.size() > counter) {
                         hrmRedValues.add(String.valueOf(ssensorEvent.values[0]));
+                    }
+                    else if(hrmRedValues != null && hrmRedValues.size() > counter && hrmIrValues != null && hrmIrValues.size() > counter){
+                        String data = "LED_IR, " + getSubstring(hrmIrValues.toString()) + "\n" + "LED_RED, " + getSubstring(hrmRedValues.toString());
+                        writeToFile(data,"recording.csv");
+                        System.out.println(data);                
+                        record = false;
                     }
                     break;
                 }
@@ -142,10 +154,10 @@ public class MainActivity extends FlutterActivity {
         }
     };
 
-    private void writeToFile(String data) {
+    private void writeToFile(String data, String filename) {
         try {
             Context context = this.getApplicationContext();
-            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput("data.txt", Context.MODE_PRIVATE));
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput(filename, Context.MODE_PRIVATE));
             outputStreamWriter.write(data);
             outputStreamWriter.close();
         } catch (IOException e) {
