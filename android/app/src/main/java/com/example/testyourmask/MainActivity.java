@@ -32,6 +32,7 @@ public class MainActivity extends FlutterActivity {
     List<String> hrmIrValues;
     List<String> hrmRedValues;
     int counter;
+    private MethodChannel methodChannel;
 
 
     @Override
@@ -69,31 +70,32 @@ public class MainActivity extends FlutterActivity {
     public void configureFlutterEngine(@NonNull FlutterEngine flutterEngine) {
         GeneratedPluginRegistrant.registerWith(flutterEngine);
 
-        new MethodChannel(flutterEngine.getDartExecutor().getBinaryMessenger(), CHANNEL)
-                .setMethodCallHandler(
-                        (call, result) -> {
-                            // Note: this method is invoked on the main thread.
-                            if (call.method.equals("fetchValues")) {
-                                hrmIrValues = new ArrayList<>();
-                                hrmRedValues = new ArrayList<>();
-                                counter = 50;
-                                result.success(counter);
-                            }
-                            if (call.method.equals("getSensorValue")) {
-                                if (hrmRedValues != null && hrmIrValues != null) {
-                                    String data = getData(hrmIrValues, hrmRedValues);
-                                    writeToFile(data);
-                                    System.out.println(data);
-                                    result.success(data);
-                                } else {
-                                    result.error("UNAVAILABLE", "NO VALUES available.", null);
-                                }
-                            } else {
-                                result.notImplemented();
-                            }
+        methodChannel = new MethodChannel(flutterEngine.getDartExecutor().getBinaryMessenger(), CHANNEL);
+        methodChannel.setMethodCallHandler(
+                (call, result) -> {
+                    // Note: this method is invoked on the main thread.
+                    if (call.method.equals("fetchValues")) {
+                        hrmIrValues = new ArrayList<>();
+                        hrmRedValues = new ArrayList<>();
+                        counter = 50;
+                        result.success(counter);
+                    }
+                    if (call.method.equals("getSensorValue")) {
+                        if (hrmRedValues != null && hrmIrValues != null) {
+                            String data = getData(hrmIrValues, hrmRedValues);
+                            writeToFile(data);
+                            System.out.println(data);
+                            result.success(data);
+                        } else {
+                            result.error("UNAVAILABLE", "NO VALUES available.", null);
                         }
-                );
+                    } else {
+                        result.notImplemented();
+                    }
+                }
+        );
     }
+
     SsensorEventListener ssensorEventListener = new SsensorEventListener() {
         @Override
         public void OnSensorChanged(SsensorEvent ssensorEvent) {
@@ -102,12 +104,14 @@ public class MainActivity extends FlutterActivity {
 
             switch (sensor.getType()) {
                 case Ssensor.TYPE_HRM_LED_IR: {
+                    methodChannel.invokeMethod("ledIr", ssensorEvent.values[0]);
                     if (hrmIrValues != null && hrmIrValues.size() <= counter) {
                         hrmIrValues.add(String.valueOf(ssensorEvent.values[0]));
                     }
                     break;
                 }
                 case Ssensor.TYPE_HRM_LED_RED: {
+                    methodChannel.invokeMethod("ledRed", ssensorEvent.values[0]);
                     if (hrmRedValues != null && hrmRedValues.size() <= counter) {
                         hrmRedValues.add(String.valueOf(ssensorEvent.values[0]));
                     }
