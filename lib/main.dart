@@ -61,6 +61,21 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  Future<void> _fetchValues() async {
+    var result;
+    String sensorValues;
+    try {
+      result = await platform.invokeMethod('fetchValues');
+      sensorValues = 'Sensor at $result % .';
+    } on PlatformException catch (e) {
+      result = "Failed to get sensor values: '${e.message}'.";
+    }
+
+    setState(() {
+      _sensorValues = sensorValues;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Material(
@@ -77,10 +92,20 @@ class _MyHomePageState extends State<MyHomePage> {
               child: Text('Get Battery Level'),
               onPressed: _getBatteryLevel,
             ),
+            SizedBox(height: 20,),
             Text(_batteryLevel),
-            RaisedButton(
-              child: Text('Get Sensor Values'),
-              onPressed: _getSensorValues,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                RaisedButton(
+                  child: Text('Start Recording'),
+                  onPressed: _fetchValues,
+                ),
+                RaisedButton(
+                  child: Text('Get Sensor Values'),
+                  onPressed: _getSensorValues,
+                )
+              ],
             ),
             Expanded(
               child: Padding(

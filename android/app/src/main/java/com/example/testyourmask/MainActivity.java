@@ -61,8 +61,6 @@ public class MainActivity extends FlutterActivity {
 //        Ssensor hrmBlue = ssensorManager.getDefaultSensor(SsensorExtension.TYPE_HRM_LED_BLUE);
         ssensorManager.registerListener(ssensorEventListener, hrmIr, SensorManager.SENSOR_DELAY_NORMAL);
         ssensorManager.registerListener(ssensorEventListener, hrmRed, SensorManager.SENSOR_DELAY_NORMAL);
-        hrmIrValues = new ArrayList<>();
-        hrmRedValues = new ArrayList<>();
     }
 
     @Override
@@ -81,6 +79,12 @@ public class MainActivity extends FlutterActivity {
                 .setMethodCallHandler(
                         (call, result) -> {
                             // Note: this method is invoked on the main thread.
+                            if (call.method.equals("fetchValues")) {
+                                hrmIrValues = new ArrayList<>();
+                                hrmIrValues.add("Starting Now");
+                                hrmRedValues = new ArrayList<>();
+                                hrmRedValues.add("Starting now");
+                            }
                             if (call.method.equals("getSensorValue")) {
                                 if (sensorToValues != null) {
                                     sensorToValues.put("LED_IR: ", hrmIrValues.toString());
@@ -105,13 +109,15 @@ public class MainActivity extends FlutterActivity {
             Ssensor sensor = ssensorEvent.sensor;
             switch (sensor.getType()) {
                 case Ssensor.TYPE_HRM_LED_IR: {
-                    hrmIrValues.add(String.valueOf(ssensorEvent.values[0]));
-                    sensorToValues.put("LED_IR: ", Arrays.toString(ssensorEvent.values));
+                    if (hrmIrValues != null) {
+                        hrmIrValues.add(String.valueOf(ssensorEvent.values[0]));
+                    }
                     break;
                 }
                 case Ssensor.TYPE_HRM_LED_RED: {
-                    hrmRedValues.add(String.valueOf(ssensorEvent.values[0]));
-                    sensorToValues.put("LED_RED: ", Arrays.toString(ssensorEvent.values));
+                    if (hrmRedValues != null) {
+                        hrmRedValues.add(String.valueOf(ssensorEvent.values[0]));
+                    }
                     break;
                 }
                 default: {
@@ -133,8 +139,7 @@ public class MainActivity extends FlutterActivity {
             OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput("data.txt", Context.MODE_PRIVATE));
             outputStreamWriter.write(data);
             outputStreamWriter.close();
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             System.out.println("Exception: File write failed: " + e.toString());
         }
     }
