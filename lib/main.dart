@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -46,12 +48,29 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+//  Future<void> _getSensorValues() async {
+//    var result;
+//    String sensorValues;
+//    try {
+//      result = await platform.invokeMethod('getSensorValue');
+//      sensorValues = '$result';
+//    } on PlatformException catch (e) {
+//      result = "Failed to get sensor values: '${e.message}'.";
+//    }
+//
+//    setState(() {
+//      _sensorValues = sensorValues;
+//    });
+//  }
+
   Future<void> _getSensorValues() async {
     var result;
     String sensorValues;
     try {
+      await platform.invokeMethod('fetchValues');
+      sleep(Duration(seconds:10));
       result = await platform.invokeMethod('getSensorValue');
-      sensorValues = 'Sensor at $result % .';
+      sensorValues = '$result';
     } on PlatformException catch (e) {
       result = "Failed to get sensor values: '${e.message}'.";
     }
@@ -97,10 +116,10 @@ class _MyHomePageState extends State<MyHomePage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
-                RaisedButton(
-                  child: Text('Start Recording'),
-                  onPressed: _fetchValues,
-                ),
+//                RaisedButton(
+//                  child: Text('Start Recording'),
+//                  onPressed: _fetchValues,
+//                ),
                 RaisedButton(
                   child: Text('Get Sensor Values'),
                   onPressed: _getSensorValues,

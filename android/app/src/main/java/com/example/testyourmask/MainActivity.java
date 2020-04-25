@@ -9,7 +9,6 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.core.content.FileProvider;
 
 import com.samsung.android.sdk.SsdkUnsupportedException;
 import com.samsung.android.sdk.sensorextension.Ssensor;
@@ -21,10 +20,7 @@ import com.samsung.android.sdk.sensorextension.SsensorManager;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import io.flutter.embedding.android.FlutterActivity;
 import io.flutter.embedding.engine.FlutterEngine;
@@ -33,12 +29,9 @@ import io.flutter.plugins.GeneratedPluginRegistrant;
 
 public class MainActivity extends FlutterActivity {
     private static final String CHANNEL = "com.rocinante.tym/battery";
-    Map<String, String> sensorToValues = new HashMap<>();
     List<String> hrmIrValues;
     List<String> hrmRedValues;
     int counter;
-    long startTimeIR;
-    long startTimeRED;
 
 
     @Override
@@ -59,9 +52,7 @@ public class MainActivity extends FlutterActivity {
         }
         SsensorManager ssensorManager = new SsensorManager(this, ssensorExtension);
         Ssensor hrmIr = ssensorManager.getDefaultSensor(SsensorExtension.TYPE_HRM_LED_IR);
-//        Ssensor hrmGreen = ssensorManager.getDefaultSensor(SsensorExtension.TYPE_HRM_LED_GREEN);
         Ssensor hrmRed = ssensorManager.getDefaultSensor(SsensorExtension.TYPE_HRM_LED_RED);
-//        Ssensor hrmBlue = ssensorManager.getDefaultSensor(SsensorExtension.TYPE_HRM_LED_BLUE);
         ssensorManager.registerListener(ssensorEventListener, hrmIr, SensorManager.SENSOR_DELAY_NORMAL);
         ssensorManager.registerListener(ssensorEventListener, hrmRed, SensorManager.SENSOR_DELAY_NORMAL);
     }
@@ -86,12 +77,11 @@ public class MainActivity extends FlutterActivity {
                                 hrmIrValues = new ArrayList<>();
                                 hrmRedValues = new ArrayList<>();
                                 counter = 50;
-//                                startTimeIR = System.currentTimeMillis();
-//                                startTimeRED = System.currentTimeMillis();
+                                result.success(counter);
                             }
                             if (call.method.equals("getSensorValue")) {
                                 if (hrmRedValues != null && hrmIrValues != null) {
-                                    String data = "LED_RED, " + getSubstring(hrmRedValues.toString()) + '\n' + "LED_IR, " + getSubstring(hrmIrValues.toString());
+                                    String data = getData(hrmIrValues, hrmRedValues);
                                     writeToFile(data);
                                     System.out.println(data);
                                     result.success(data);
@@ -104,11 +94,6 @@ public class MainActivity extends FlutterActivity {
                         }
                 );
     }
-
-    private String getSubstring(String redString) {
-        return redString.substring(redString.indexOf('[') + 1, redString.indexOf(']'));
-    }
-
     SsensorEventListener ssensorEventListener = new SsensorEventListener() {
         @Override
         public void OnSensorChanged(SsensorEvent ssensorEvent) {
@@ -142,10 +127,18 @@ public class MainActivity extends FlutterActivity {
         }
     };
 
+    private String getData(List<String> hrmIrValues, List<String> hrmRedValues) {
+        String irValues = hrmIrValues.toString();
+        String redValues = hrmRedValues.toString();
+        String red = redValues.substring(redValues.indexOf('[') + 1, redValues.indexOf(']'));
+        String ir = irValues.substring(irValues.indexOf('[') + 1, irValues.indexOf(']'));
+        return "LED_RED, " + red + '\n' + "LED_IR, " + ir;
+    }
+
     private void writeToFile(String data) {
         try {
             Context context = this.getApplicationContext();
-            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput("data.txt", Context.MODE_PRIVATE));
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput("data.csv", Context.MODE_PRIVATE));
             outputStreamWriter.write(data);
             outputStreamWriter.close();
         } catch (IOException e) {
