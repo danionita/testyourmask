@@ -35,3 +35,9 @@ lib/generated_plugin_registrant.dart
 
 # Exceptions to above rules.
 !/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
+.vscode/launch.json
+android/.project
+android/app/.project
+build/app/intermediates/flutter/debug/libs.jar
+build/app/intermediates/merged_java_res/debug/out.jar
+*.jar
