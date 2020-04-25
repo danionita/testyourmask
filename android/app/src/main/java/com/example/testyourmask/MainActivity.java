@@ -79,8 +79,7 @@ public class MainActivity extends FlutterActivity {
                         hrmRedValues = new ArrayList<>();
                         counter = 50;
                         result.success(counter);
-                    }
-                    if (call.method.equals("getSensorValue")) {
+                    } else if (call.method.equals("getSensorValue")) {
                         if (hrmRedValues != null && hrmIrValues != null) {
                             String data = getData(hrmIrValues, hrmRedValues);
                             writeToFile(data);

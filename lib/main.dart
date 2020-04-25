@@ -57,8 +57,6 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  Future<void> realtimeResult(int x) async {}
-
   @override
   Widget build(BuildContext context) {
     final values = Provider.of<Values>(context);
