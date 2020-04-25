@@ -32,11 +32,8 @@ public class MainActivity extends FlutterActivity {
     List<String> hrmIrValues;
     List<String> hrmRedValues;
     int counter;
-<<<<<<< HEAD
     int filecounter =1;
-=======
     private MethodChannel methodChannel;
->>>>>>> 1d606d7c35accb03cb12be577b6ca018c625773f
 
 
     @Override
