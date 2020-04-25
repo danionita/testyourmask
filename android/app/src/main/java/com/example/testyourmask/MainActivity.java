@@ -37,6 +37,8 @@ public class MainActivity extends FlutterActivity {
     List<String> hrmIrValues;
     List<String> hrmRedValues;
     int counter;
+    long startTimeIR;
+    long startTimeRED;
 
 
     @Override
@@ -82,19 +84,17 @@ public class MainActivity extends FlutterActivity {
                             // Note: this method is invoked on the main thread.
                             if (call.method.equals("fetchValues")) {
                                 hrmIrValues = new ArrayList<>();
-                                hrmIrValues.add("Starting Now");
                                 hrmRedValues = new ArrayList<>();
-                                hrmRedValues.add("Starting now");
                                 counter = 50;
+//                                startTimeIR = System.currentTimeMillis();
+//                                startTimeRED = System.currentTimeMillis();
                             }
                             if (call.method.equals("getSensorValue")) {
-                                if (sensorToValues != null) {
-                                    sensorToValues.put("LED_IR: ", hrmIrValues.toString());
-                                    sensorToValues.put("LED_RED: ", hrmRedValues.toString());
-                                    String result1 = sensorToValues.toString();
-                                    writeToFile(result1);
-                                    System.out.println("===> " + result1);
-                                    result.success(result1);
+                                if (hrmRedValues != null && hrmIrValues != null) {
+                                    String data = "LED_RED, " + getSubstring(hrmRedValues.toString()) + '\n' + "LED_IR, " + getSubstring(hrmIrValues.toString());
+                                    writeToFile(data);
+                                    System.out.println(data);
+                                    result.success(data);
                                 } else {
                                     result.error("UNAVAILABLE", "NO VALUES available.", null);
                                 }
@@ -105,11 +105,16 @@ public class MainActivity extends FlutterActivity {
                 );
     }
 
+    private String getSubstring(String redString) {
+        return redString.substring(redString.indexOf('[') + 1, redString.indexOf(']'));
+    }
+
     SsensorEventListener ssensorEventListener = new SsensorEventListener() {
         @Override
         public void OnSensorChanged(SsensorEvent ssensorEvent) {
 
             Ssensor sensor = ssensorEvent.sensor;
+
             switch (sensor.getType()) {
                 case Ssensor.TYPE_HRM_LED_IR: {
                     if (hrmIrValues != null && hrmIrValues.size() <= counter) {

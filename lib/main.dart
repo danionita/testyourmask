@@ -66,7 +66,7 @@ class _MyHomePageState extends State<MyHomePage> {
     String sensorValues;
     try {
       result = await platform.invokeMethod('fetchValues');
-      sensorValues = 'Sensor at $result % .';
+      sensorValues = '$result';
     } on PlatformException catch (e) {
       result = "Failed to get sensor values: '${e.message}'.";
     }
