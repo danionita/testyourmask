@@ -68,7 +68,7 @@ class _MyHomePageState extends State<MyHomePage> {
     String sensorValues;
     try {
       await platform.invokeMethod('fetchValues');
-      sleep(Duration(seconds:10));
+      sleep(Duration(seconds:5));
       result = await platform.invokeMethod('getSensorValue');
       sensorValues = '$result';
     } on PlatformException catch (e) {
