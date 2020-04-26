@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:testyourmask/values.dart';
 import 'package:sleek_circular_slider/sleek_circular_slider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'grade.dart';
 
@@ -47,6 +48,14 @@ class _HomeState extends State<Home> {
       print("Failed to get sensor values: '${e.message}'.");
     }
   }
+  _launchURL() async {
+    const url = 'https://ko-fi.com/testyourmask';
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -78,7 +87,7 @@ class _HomeState extends State<Home> {
                       'DONATE!',
                       style: TextStyle(color: Colors.white),
                     ),
-                    onPressed: () {},
+                    onPressed: _launchURL,
                   ),
                 )
               ],
