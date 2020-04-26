@@ -83,9 +83,10 @@ class _HomeState extends State<Home> {
                 children: <Widget>[
                   Text('Calibrate: ${values.irValue}'),
                   CircleAvatar(
-                    backgroundColor: double.parse(values.irValue) < 10000
-                        ? Colors.red
-                        : Colors.green,
+                    backgroundColor:
+                        _calibrationOk(double.parse(values.irValue))
+                            ? Colors.green
+                            : Colors.red,
                   )
 //                  Text('RedValue: ${values.redValue}'),
                 ],
@@ -124,5 +125,12 @@ class _HomeState extends State<Home> {
         ),
       ),
     );
+  }
+
+  bool _calibrationOk(double value) {
+    if ( 8000 < value && value < 12000) {
+      return true;
+    } else
+      return false;
   }
 }
