@@ -28,24 +28,23 @@ class _HomeState extends State<Home> {
     setState(() {
       widget.isLoading = true;
     });
-
-    var result;
-    String sensorValues;
     try {
-      await platform.invokeMethod('fetchValues');
-
-      sleep(Duration(seconds: duration));
-
-      result = await platform.invokeMethod('getSensorValue');
-      sensorValues = '$result';
+      await platform.invokeMethod('fetchValues').then((_) async {
+        await Future.delayed(Duration(seconds: 5)).then((_) async {
+          return await platform.invokeMethod('getSensorValue');
+        }).then(
+          (sensorValues) {
+            this.grade = Grade.withSensorValues(sensorValues);
+            setState(() {
+              _sensorValues = sensorValues;
+              widget.isLoading = false;
+            });
+          },
+        );
+      });
     } on PlatformException catch (e) {
-      result = "Failed to get sensor values: '${e.message}'.";
+      print("Failed to get sensor values: '${e.message}'.");
     }
-    this.grade = Grade.withSensorValues(sensorValues);
-    setState(() {
-      _sensorValues = sensorValues;
-      widget.isLoading = false;
-    });
   }
 
   @override
@@ -97,7 +96,7 @@ class _HomeState extends State<Home> {
                     child: widget.isLoading
                         ? createCircularSliderForLoading()
                         : createCircularSlider(),
-//                      ? Text("LOADING!")
+//                        ? Text("LOADING!")
 //                        : Text(_sensorValues),
                   ),
                 ),
