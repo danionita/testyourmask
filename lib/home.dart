@@ -62,49 +62,65 @@ class _HomeState extends State<Home> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          "watch intro",
-          style: TextStyle(fontSize: 14),
-        ),
-      ),
+          title: Text(
+            "watch intro",
+            style: TextStyle(fontSize: 14),
+          ),
+          actions: <Widget>[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: RaisedButton(
+                    color: Colors.deepOrange,
+                    child: Text(
+                      'DONATE!',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    onPressed: () {},
+                  ),
+                )
+              ],
+            ),
+          ]),
       body: Padding(
-        padding: const EdgeInsets.all(15.0),
+        padding: const EdgeInsets.all(45.0),
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              CircleAvatar(
-                radius: 50,
-                backgroundImage: NetworkImage(
-                    'https://i.pinimg.com/236x/83/13/bb/8313bbedf58b9576f36de321c96db50f.jpg'),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
-                  Text('Calibrate: ${values.irValue}'),
-                  CircleAvatar(
-                    backgroundColor: double.parse(values.irValue) < 10000
-                        ? Colors.red
-                        : Colors.green,
-                  )
-//                  Text('RedValue: ${values.redValue}'),
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
-                  Text('Grade: ${grade.grade}'),
-                ],
-              ),
-              Expanded(
+              Flexible(
                 child: Padding(
                   padding: const EdgeInsets.all(10.0),
                   child: SingleChildScrollView(
                     child: widget.isLoading
-                        ? Text("LOADING!")
-                        : Text(_sensorValues),
+                        ? createCircularSliderForLoading()
+                        : createCircularSlider(),
+//                      ? Text("LOADING!")
+//                        : Text(_sensorValues),
                   ),
                 ),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: <Widget>[
+                  Text(
+                    'Calibrate: ${values.irValue}',
+                    style: TextStyle(
+                      color: Colors.blue,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                    ),
+                  ),
+                  CircleAvatar(
+                    backgroundColor:
+                        _calibrationOk(double.parse(values.irValue))
+                            ? Colors.green
+                            : Colors.red,
+                  )
+//                  Text('RedValue: ${values.redValue}'),
+                ],
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -113,7 +129,7 @@ class _HomeState extends State<Home> {
                     color: Theme.of(context).primaryColor,
                     child: Text(
                       'Get Sensor Values',
-                      style: TextStyle(color: Theme.of(context).accentColor),
+                      style: TextStyle(color: Colors.white),
                     ),
                     onPressed: _getSensorValues,
                   )
@@ -123,6 +139,111 @@ class _HomeState extends State<Home> {
           ),
         ),
       ),
+    );
+  }
+
+  bool _calibrationOk(double value) {
+    if (8000 < value && value < 12000) {
+      return true;
+    } else
+      return false;
+  }
+
+  Widget createCircularSliderForLoading() {
+    return SleekCircularSlider(
+      appearance: getCircularAppearanceForLoading(),
+      initialValue: 9,
+      innerWidget: (double value) {
+        return Center(
+          child: Text(
+            'Loading...',
+            style: TextStyle(
+              color: Colors.blue,
+              fontWeight: FontWeight.bold,
+              fontSize: 10,
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget createCircularSlider() {
+    return SleekCircularSlider(
+      appearance: getCircularAppearance(),
+      initialValue: double.parse(grade.grade),
+      min: 0.0,
+      max: 10.0,
+      innerWidget: (double value) {
+        return Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Text(
+                grade.grade,
+                style: TextStyle(
+                  color: Colors.blue,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 40,
+                ),
+              ),
+              Text("Grade",
+                  style: TextStyle(
+                    color: Colors.blue,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                  )),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  CircularSliderAppearance getCircularAppearance() {
+    return CircularSliderAppearance(
+      customWidths: CustomSliderWidths(
+        trackWidth: 1,
+        progressBarWidth: 5,
+        shadowWidth: 15,
+      ),
+      customColors: CustomSliderColors(
+        dotColor: Colors.white,
+        trackColor: Colors.blue.withOpacity(0.6),
+        progressBarColors: [
+          Colors.green.withOpacity(1),
+          Colors.green.withOpacity(1),
+          Colors.red.withOpacity(0.8),
+          Colors.red.withOpacity(0.8),
+        ],
+        hideShadow: true,
+        shadowColor: Colors.blue,
+        shadowMaxOpacity: 0.07,
+      ),
+      size: 250.0,
+    );
+  }
+
+  CircularSliderAppearance getCircularAppearanceForLoading() {
+    return CircularSliderAppearance(
+      customWidths: CustomSliderWidths(
+        trackWidth: 1,
+        progressBarWidth: 5,
+        shadowWidth: 15,
+      ),
+      customColors: CustomSliderColors(
+        dotColor: Colors.white,
+        trackColor: Colors.blue.withOpacity(0.6),
+        progressBarColors: [
+          Colors.red.withOpacity(0.8),
+          Colors.green.withOpacity(0.5),
+        ],
+        shadowColor: Colors.green,
+        shadowMaxOpacity: 0.07,
+      ),
+      size: 100.0,
+      spinnerMode: true,
+      spinnerDuration: 1500,
     );
   }
 }
