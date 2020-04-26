@@ -201,16 +201,18 @@ final customColors = CustomSliderColors(
 final customResultColors = CustomSliderColors(
   dotColor: Colors.white.withOpacity(0.8),
   trackColor: HexColor('#98DBFC').withOpacity(0.3),
-  progressBarColors: [Colors.green, Colors.red],
+  progressBarColors: [Colors.red, Colors.green],
+  gradientStartAngle: 45,
+  gradientEndAngle: 360,
   hideShadow: true,
 );
 
 final CircularSliderAppearance circularSliderAppearanceWithSpinner =
     CircularSliderAppearance(
   customWidths:
-      CustomSliderWidths(trackWidth: 2, progressBarWidth: 5, shadowWidth: 10),
+      CustomSliderWidths(trackWidth: 4, progressBarWidth: 10, shadowWidth: 10),
   customColors: customColors,
-  startAngle: 0,
+  startAngle: 90,
   angleRange: 360,
   size: 200,
   spinnerMode: true,
@@ -220,9 +222,9 @@ final CircularSliderAppearance circularSliderAppearanceWithSpinner =
 final CircularSliderAppearance circularSliderAppearanceWithoutSpinner =
     CircularSliderAppearance(
   customWidths:
-      CustomSliderWidths(trackWidth: 2, progressBarWidth: 5, shadowWidth: 10),
+      CustomSliderWidths(trackWidth: 4, progressBarWidth: 10, shadowWidth: 10),
   customColors: customResultColors,
-  startAngle: 270,
+  startAngle: 90,
   angleRange: 360,
   size: 200,
 );
