@@ -73,6 +73,19 @@ class _HomeState extends State<Home> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: <Widget>[
+                  RaisedButton(
+                    color: Colors.deepOrange,
+                    child: Text(
+                      'DONATE!',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    onPressed: (){},
+                  )
+                ],
+              ),
               CircleAvatar(
                 radius: 50,
                 backgroundImage: NetworkImage(
@@ -128,7 +141,7 @@ class _HomeState extends State<Home> {
   }
 
   bool _calibrationOk(double value) {
-    if ( 8000 < value && value < 12000) {
+    if (8000 < value && value < 12000) {
       return true;
     } else
       return false;
