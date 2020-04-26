@@ -32,6 +32,7 @@ public class MainActivity extends FlutterActivity {
     List<String> hrmIrValues;
     List<String> hrmRedValues;
     int counter;
+    int filecounter =1;
     private MethodChannel methodChannel;
 
 
@@ -77,7 +78,7 @@ public class MainActivity extends FlutterActivity {
                     if (call.method.equals("fetchValues")) {
                         hrmIrValues = new ArrayList<>();
                         hrmRedValues = new ArrayList<>();
-                        counter = 50;
+                        counter = 500;
                         result.success(counter);
                     } else if (call.method.equals("getSensorValue")) {
                         if (hrmRedValues != null && hrmIrValues != null) {
@@ -141,8 +142,9 @@ public class MainActivity extends FlutterActivity {
     private void writeToFile(String data) {
         try {
             Context context = this.getApplicationContext();
-            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput("data.csv", Context.MODE_PRIVATE));
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput("data"+filecounter+".csv", Context.MODE_PRIVATE));
             outputStreamWriter.write(data);
+            filecounter+=1;
             outputStreamWriter.close();
         } catch (IOException e) {
             System.out.println("Exception: File write failed: " + e.toString());
