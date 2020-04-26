@@ -62,7 +62,10 @@ class _HomeState extends State<Home> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("watch intro", style: TextStyle(fontSize: 14),),
+        title: Text(
+          "watch intro",
+          style: TextStyle(fontSize: 14),
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(15.0),
@@ -78,8 +81,13 @@ class _HomeState extends State<Home> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
-                  Text('IrValue: ${values.irValue}'),
-                  Text('RedValue: ${values.redValue}'),
+                  Text('Calibrate: ${values.irValue}'),
+                  CircleAvatar(
+                    backgroundColor: double.parse(values.irValue) < 10000
+                        ? Colors.red
+                        : Colors.green,
+                  )
+//                  Text('RedValue: ${values.redValue}'),
                 ],
               ),
               Row(
