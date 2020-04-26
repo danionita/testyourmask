@@ -1,16 +1,9 @@
 # testyourmask
 
-A new Flutter project.
+As part of the [EUVvsVirus hackathon](https://euvsvirus.org/), we developed an app to classify face masks based on their filtration capabilities using the HRM sensor from Samsung Galaxy phones.
+The app is still in it's early stages, bit we are getting promising results and We are are planning to make it freely available on the Play Store.
 
-## Getting Started
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+# Buy us a coffee
+https://ko-fi.com/testyourmask
+ 
