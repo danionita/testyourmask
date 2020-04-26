@@ -1,22 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 
-import 'home.dart';
-
 Color bgColor = Color(0xFFF3F3F3);
 Color textColor = Color(0xFF83838A);
 
 List<String> imagePath = [
-  "assets/images/intro1.png",
-  "assets/images/intro2.png",
-  "assets/images/img1.jpg",
+  "assets/images/intro_pic.jpg",
+  "assets/images/slide1.png",
+  "assets/images/slide2.png",
+  "assets/images/slide3.png",
 ];
-List<String> title = ["Wellcome", "Browse", "Ready , set .."];
-List<String> description = [
-  "Discover new sales & fitness updates everyday with ",
-  "We connect you to your favourite online retailers and show you all the best deals in one place.",
-  "Find the perfect fit for you."
-];
+List<String> title = ["Welcome", "What you need", "How to scan your mask"];
+String welcomeString = "This app uses the optical sensor on the back of"
+"your phone to estimate the quality of your face mask.";
+String page1String = "1. A dark or shaded area. \n"
+  "2. A hard, black surface with as little gloss as possible.\n"
+  "3. A Samsung Galaxy Note 4 (or newer) or Samsung Galaxy S6 (or newer).\n"
+  "Remove its case for best results.";
+String page2String = "First calibrate the sensor by pressing the phone"
+"face down on the black surface. \n"
+"If calibration is not successful, the surface is too shiny, or you are"
+"not pressing down hard enough.";
+String page3String = "Once calibration is successful, place the mask in-between the phone and"
+"the black surface.\n"
+"Press the scan button and wait for the results";
+List<String> description = [welcomeString,page1String,page2String];
 
 class Intro extends StatelessWidget {
   @override
@@ -31,40 +39,36 @@ class Intro extends StatelessWidget {
 class ContentPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Padding(
-          padding: EdgeInsets.only(top: 30),
-          child: Column(
-            children: <Widget>[
-              CarouselSlider(
-                autoPlay: false,
-                enableInfiniteScroll: false,
-                initialPage: 0,
-                reverse: false,
-                viewportFraction: 1.0,
-                aspectRatio: MediaQuery.of(context).size.aspectRatio,
-                height: MediaQuery.of(context).size.height - 30,
-                items: [0, 1, 2].map((i) {
-                  return Builder(
-                    builder: (BuildContext context) {
-                      return Container(
-                          width: MediaQuery.of(context).size.width,
-                          child: AppItro(i));
-                    },
-                  );
-                }).toList(),
-              ),
-            ],
-          )),
-    );
+    return Padding(
+        padding: EdgeInsets.only(top: 30),
+        child: Column(
+          children: <Widget>[
+            CarouselSlider(
+              autoPlay: false,
+              enableInfiniteScroll: false,
+              initialPage: 0,
+              reverse: false,
+              viewportFraction: 1.0,
+              aspectRatio: MediaQuery.of(context).size.aspectRatio,
+              height: MediaQuery.of(context).size.height - 30,
+              items: [0, 1, 2, 3].map((i) {
+                return Builder(
+                  builder: (BuildContext context) {
+                    return Container(
+                        width: MediaQuery.of(context).size.width,
+                        child: AppItro(i));
+                  },
+                );
+              }).toList(),
+            ),
+          ],
+        ));
   }
 }
 
 class AppItro extends StatefulWidget {
   int index;
-
   AppItro(this.index);
-
   @override
   _AppItroState createState() => _AppItroState();
 }
@@ -97,17 +101,12 @@ class _AppItroState extends State<AppItro> {
               Positioned(
                   right: 24,
                   top: 14,
-                  child: GestureDetector(
-                    onTap: () {
-                      Navigator.of(context).pushNamed(Home.routeName);
-                    },
-                    child: Text(
-                      widget.index == 2 ? "DONE" : "SKIP",
-                      style: TextStyle(
-                          fontSize: 16,
-                          color: textColor,
-                          fontFamily: "SultanNahia"),
-                    ),
+                  child: new Text(
+                    widget.index == 2 ? "DONE" : "SKIP",
+                    style: TextStyle(
+                        fontSize: 16,
+                        color: textColor,
+                        fontFamily: "SultanNahia"),
                   ))
             ],
           ),
@@ -121,9 +120,9 @@ class _AppItroState extends State<AppItro> {
                   width: MediaQuery.of(context).size.width),
               Center(
                   child: new Text(
-                title[widget.index],
-                style: TextStyle(fontFamily: "Caslon", fontSize: 30),
-              )),
+                    title[widget.index],
+                    style: TextStyle(fontFamily: "Caslon", fontSize: 30),
+                  )),
               Container(
                 margin: EdgeInsets.symmetric(horizontal: 24, vertical: 24),
                 child: Center(
@@ -165,9 +164,9 @@ class _AppItroState extends State<AppItro> {
                   top: widget.index != 2 ? 20 : 0,
                   child: widget.index != 2
                       ? Image.asset(
-                          'assets/images/arrow.png',
-                          width: 36,
-                        )
+                    'assets/images/arrow.png',
+                    width: 36,
+                  )
                       : LetsGo())
             ],
           ),
@@ -179,9 +178,7 @@ class _AppItroState extends State<AppItro> {
 
 class Dots extends StatefulWidget {
   int index;
-
   Dots(this.index);
-
   @override
   _DotsState createState() => _DotsState();
 }
@@ -225,14 +222,9 @@ class LetsGo extends StatelessWidget {
           Positioned(
               top: 16,
               left: 12,
-              child: GestureDetector(
-                child: Text(
-                  "LET'S GO!",
-                  style: TextStyle(color: Colors.white),
-                ),
-                onTap: () {
-                  Navigator.of(context).pushNamed(Home.routeName);
-                },
+              child: Text(
+                "LET'S GO!",
+                style: TextStyle(color: Colors.white),
               ))
         ],
       ),
