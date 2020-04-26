@@ -39,6 +39,8 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   static const platform = const MethodChannel('com.rocinante.tym/battery');
   String _sensorValues = "Unkown sensor values";
+  String gradeIr;
+  String gradeRed;
 
   Future<void> _getSensorValues() async {
     var result;
@@ -51,10 +53,30 @@ class _MyHomePageState extends State<MyHomePage> {
     } on PlatformException catch (e) {
       result = "Failed to get sensor values: '${e.message}'.";
     }
-
+    _computeGrade(sensorValues);
     setState(() {
       _sensorValues = sensorValues;
     });
+  }
+
+  void _computeGrade(String sensorValues) {
+    List<String> ss = sensorValues.split('\nLED_IR, ');
+    int length2 = 'LED_RED, '.length;
+    List<String> redValues =
+        ss[0].substring(ss[0].indexOf('LED_RED, ') + length2).split(', ');
+    List<String> irValues = ss[1].split(', ');
+    List<double> red = List<double>();
+    List<double> ir = List<double>();
+
+    redValues.forEach((s) => red.add(double.parse(s)));
+    irValues.forEach((s) => ir.add(double.parse(s)));
+
+    var doubleIr =
+        ir.reduce((a, b) => a + b) / ir.length / 40000; //TODO calibration
+    var doubleRed =
+        red.reduce((a, b) => a + b) / red.length / 40000; //TODO calibration
+    this.gradeIr = doubleIr.toStringAsFixed(1);
+    this.gradeRed = doubleRed.toStringAsFixed(1);
   }
 
   @override
@@ -84,6 +106,13 @@ class _MyHomePageState extends State<MyHomePage> {
               children: <Widget>[
                 Text('IrValue: ${values.irValue}'),
                 Text('RedValue: ${values.redValue}'),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                Text('IR grade: $gradeIr'),
+                Text('Red grade: $gradeRed'),
               ],
             ),
             Row(
