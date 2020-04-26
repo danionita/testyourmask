@@ -25,8 +25,8 @@ class MyApp extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           theme: ThemeData(
             primarySwatch: Colors.blue,
-            primaryColor: Color.fromRGBO(64, 79, 98, 1),
-            accentColor: Color.fromRGBO(23, 51, 78, 1),
+            primaryColor: Color.fromRGBO(163, 201, 250, 1),
+            accentColor: Color.fromRGBO(59, 129, 128, 1),
             fontFamily: 'Avenir',
           ),
           home: Intro(),
