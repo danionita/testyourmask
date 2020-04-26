@@ -130,7 +130,7 @@ class _AppItroState extends State<AppItro> {
               Center(
                   child: new Text(
                     title[widget.index],
-                    style: TextStyle(fontFamily: "Caslon", fontSize: 30),
+                    style: TextStyle(fontFamily: "Avenir Bold", fontSize: 30),
                   )),
               Container(
                 margin: EdgeInsets.symmetric(horizontal: 24, vertical: 24),
@@ -146,11 +146,6 @@ class _AppItroState extends State<AppItro> {
                             new TextSpan(
                                 text: description[widget.index],
                                 style: new TextStyle(fontFamily: 'Avenir')),
-                            new TextSpan(
-                                text: widget.index == 0 ? 'Numero1.' : '',
-                                style: new TextStyle(
-                                    fontWeight: FontWeight.normal,
-                                    fontFamily: 'AvenirBold'))
                           ])),
                 ),
               )
