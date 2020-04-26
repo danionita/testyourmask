@@ -27,6 +27,7 @@ class _HomeState extends State<Home> {
   Future<void> _getSensorValues() async {
     setState(() {
       widget.isLoading = true;
+      grade = Grade();
     });
     try {
       await platform.invokeMethod('fetchValues').then((_) async {
@@ -93,9 +94,7 @@ class _HomeState extends State<Home> {
                 child: Padding(
                   padding: const EdgeInsets.all(10.0),
                   child: SingleChildScrollView(
-                    child: widget.isLoading
-                        ? createCircularSliderForLoading()
-                        : createCircularSlider(),
+                    child: createCircularSlider(),
 //                        ? Text("LOADING!")
 //                        : Text(_sensorValues),
                   ),
@@ -113,10 +112,9 @@ class _HomeState extends State<Home> {
                     ),
                   ),
                   CircleAvatar(
-                    backgroundColor:
-                        _calibrationOk(double.parse(values.irValue))
-                            ? Colors.green
-                            : Colors.red,
+                    backgroundColor: _calibrationOk(values.irValue)
+                        ? Colors.green
+                        : Colors.red,
                   )
 //                  Text('RedValue: ${values.redValue}'),
                 ],
@@ -127,7 +125,7 @@ class _HomeState extends State<Home> {
                   RaisedButton(
                     color: Theme.of(context).primaryColor,
                     child: Text(
-                      'Get Sensor Values',
+                      'Measure!',
                       style: TextStyle(color: Colors.white),
                     ),
                     onPressed: _getSensorValues,
@@ -141,108 +139,95 @@ class _HomeState extends State<Home> {
     );
   }
 
-  bool _calibrationOk(double value) {
+  bool _calibrationOk(String valueStr) {
+    if (valueStr == null) {
+      return false;
+    }
+    double value = double.parse(valueStr);
     if (8000 < value && value < 12000) {
       return true;
     } else
       return false;
   }
 
-  Widget createCircularSliderForLoading() {
-    return SleekCircularSlider(
-      appearance: getCircularAppearanceForLoading(),
-      initialValue: 9,
-      innerWidget: (double value) {
-        return Center(
-          child: Text(
-            'Loading...',
-            style: TextStyle(
-              color: Colors.blue,
-              fontWeight: FontWeight.bold,
-              fontSize: 10,
-            ),
-          ),
-        );
-      },
-    );
-  }
-
   Widget createCircularSlider() {
     return SleekCircularSlider(
-      appearance: getCircularAppearance(),
-      initialValue: double.parse(grade.grade),
+      appearance: circularSliderAppearanceWithoutSpinner,
       min: 0.0,
       max: 10.0,
+      initialValue: double.parse(grade.grade),
       innerWidget: (double value) {
-        return Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Text(
-                grade.grade,
-                style: TextStyle(
-                  color: Colors.blue,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 40,
-                ),
-              ),
-              Text("Grade",
-                  style: TextStyle(
-                    color: Colors.blue,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20,
-                  )),
-            ],
-          ),
-        );
+        if (!widget.isLoading) {
+          return getDisplayValue();
+        } else {
+          return Align(
+            alignment: Alignment.center,
+            child: SleekCircularSlider(
+              appearance: circularSliderAppearanceWithSpinner,
+              min: 0,
+              max: 10,
+              initialValue: 1,
+            ),
+          );
+        }
       },
     );
   }
 
-  CircularSliderAppearance getCircularAppearance() {
-    return CircularSliderAppearance(
-      customWidths: CustomSliderWidths(
-        trackWidth: 1,
-        progressBarWidth: 5,
-        shadowWidth: 15,
+  Widget getDisplayValue() {
+    return Align(
+      alignment: Alignment.center,
+      child: Center(
+        child: Text(
+          'Grade: ${grade.grade}',
+          style: TextStyle(
+            color: Colors.blue,
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+          ),
+        ),
       ),
-      customColors: CustomSliderColors(
-        dotColor: Colors.white,
-        trackColor: Colors.blue.withOpacity(0.6),
-        progressBarColors: [
-          Colors.green.withOpacity(1),
-          Colors.green.withOpacity(1),
-          Colors.red.withOpacity(0.8),
-          Colors.red.withOpacity(0.8),
-        ],
-        hideShadow: true,
-        shadowColor: Colors.blue,
-        shadowMaxOpacity: 0.07,
-      ),
-      size: 250.0,
     );
   }
+}
 
-  CircularSliderAppearance getCircularAppearanceForLoading() {
-    return CircularSliderAppearance(
-      customWidths: CustomSliderWidths(
-        trackWidth: 1,
-        progressBarWidth: 5,
-        shadowWidth: 15,
-      ),
-      customColors: CustomSliderColors(
-        dotColor: Colors.white,
-        trackColor: Colors.blue.withOpacity(0.6),
-        progressBarColors: [
-          Colors.red.withOpacity(0.8),
-          Colors.green.withOpacity(0.5),
-        ],
-        shadowColor: Colors.green,
-        shadowMaxOpacity: 0.07,
-      ),
-      size: 100.0,
-      spinnerMode: true,
-      spinnerDuration: 1500,
-    );
-  }
+final customColors = CustomSliderColors(
+  dotColor: Colors.white.withOpacity(0.8),
+  trackColor: HexColor('#98DBFC').withOpacity(0.3),
+  progressBarColor: HexColor('#6DCFFF'),
+  hideShadow: true,
+);
+
+final customResultColors = CustomSliderColors(
+  dotColor: Colors.white.withOpacity(0.8),
+  trackColor: HexColor('#98DBFC').withOpacity(0.3),
+  progressBarColors: [Colors.green, Colors.red],
+  hideShadow: true,
+);
+
+final CircularSliderAppearance circularSliderAppearanceWithSpinner =
+    CircularSliderAppearance(
+  customWidths:
+      CustomSliderWidths(trackWidth: 2, progressBarWidth: 5, shadowWidth: 10),
+  customColors: customColors,
+  startAngle: 0,
+  angleRange: 360,
+  size: 200,
+  spinnerMode: true,
+  spinnerDuration: 1500,
+);
+
+final CircularSliderAppearance circularSliderAppearanceWithoutSpinner =
+    CircularSliderAppearance(
+  customWidths:
+      CustomSliderWidths(trackWidth: 2, progressBarWidth: 5, shadowWidth: 10),
+  customColors: customResultColors,
+  startAngle: 270,
+  angleRange: 360,
+  size: 200,
+);
+
+Color HexColor(String hexColor) {
+  final hexCode = hexColor.replaceAll('#', '');
+  return Color(int.parse('FF$hexCode', radix: 16));
 }
