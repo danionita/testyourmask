@@ -10,7 +10,7 @@ List<String> imagePath = [
   "assets/images/slide2.png",
   "assets/images/slide3.png",
 ];
-List<String> title = ["Welcome", "What you need", "How to scan your mask"];
+List<String> title = ["Welcome", "What you need", "Calibrate the sensor", "Scan your mask"];
 String welcomeString = "This app uses the optical sensor on the back of"
 "your phone to estimate the quality of your face mask.";
 String page1String = "1. A dark or shaded area. \n"
@@ -24,7 +24,7 @@ String page2String = "First calibrate the sensor by pressing the phone"
 String page3String = "Once calibration is successful, place the mask in-between the phone and"
 "the black surface.\n"
 "Press the scan button and wait for the results";
-List<String> description = [welcomeString,page1String,page2String];
+List<String> description = [welcomeString,page1String,page2String,page3String];
 
 class Intro extends StatelessWidget {
   @override
@@ -102,7 +102,7 @@ class _AppItroState extends State<AppItro> {
                   right: 24,
                   top: 14,
                   child: new Text(
-                    widget.index == 2 ? "DONE" : "SKIP",
+                    widget.index == 3 ? "DONE" : "SKIP",
                     style: TextStyle(
                         fontSize: 16,
                         color: textColor,
@@ -161,8 +161,8 @@ class _AppItroState extends State<AppItro> {
               ),
               Positioned(
                   right: 0,
-                  top: widget.index != 2 ? 20 : 0,
-                  child: widget.index != 2
+                  top: widget.index != 3 ? 20 : 0,
+                  child: widget.index != 3
                       ? Image.asset(
                     'assets/images/arrow.png',
                     width: 36,
