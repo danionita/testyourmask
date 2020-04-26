@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 
-void main() => runApp(MaterialApp(
-  debugShowCheckedModeBanner: false,
-  title: 'App Intro',
-  home: HomePage(),
-));
+import 'home.dart';
 
 Color bgColor = Color(0xFFF3F3F3);
 Color textColor = Color(0xFF83838A);
@@ -22,7 +18,7 @@ List<String> description = [
   "Find the perfect fit for you."
 ];
 
-class HomePage extends StatelessWidget {
+class Intro extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -35,36 +31,40 @@ class HomePage extends StatelessWidget {
 class ContentPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Padding(
-        padding: EdgeInsets.only(top: 30),
-        child: Column(
-          children: <Widget>[
-            CarouselSlider(
-              autoPlay: false,
-              enableInfiniteScroll: false,
-              initialPage: 0,
-              reverse: false,
-              viewportFraction: 1.0,
-              aspectRatio: MediaQuery.of(context).size.aspectRatio,
-              height: MediaQuery.of(context).size.height - 30,
-              items: [0, 1, 2].map((i) {
-                return Builder(
-                  builder: (BuildContext context) {
-                    return Container(
-                        width: MediaQuery.of(context).size.width,
-                        child: AppItro(i));
-                  },
-                );
-              }).toList(),
-            ),
-          ],
-        ));
+    return Scaffold(
+      body: Padding(
+          padding: EdgeInsets.only(top: 30),
+          child: Column(
+            children: <Widget>[
+              CarouselSlider(
+                autoPlay: false,
+                enableInfiniteScroll: false,
+                initialPage: 0,
+                reverse: false,
+                viewportFraction: 1.0,
+                aspectRatio: MediaQuery.of(context).size.aspectRatio,
+                height: MediaQuery.of(context).size.height - 30,
+                items: [0, 1, 2].map((i) {
+                  return Builder(
+                    builder: (BuildContext context) {
+                      return Container(
+                          width: MediaQuery.of(context).size.width,
+                          child: AppItro(i));
+                    },
+                  );
+                }).toList(),
+              ),
+            ],
+          )),
+    );
   }
 }
 
 class AppItro extends StatefulWidget {
   int index;
+
   AppItro(this.index);
+
   @override
   _AppItroState createState() => _AppItroState();
 }
@@ -97,12 +97,17 @@ class _AppItroState extends State<AppItro> {
               Positioned(
                   right: 24,
                   top: 14,
-                  child: new Text(
-                    widget.index == 2 ? "DONE" : "SKIP",
-                    style: TextStyle(
-                        fontSize: 16,
-                        color: textColor,
-                        fontFamily: "SultanNahia"),
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).pushNamed(Home.routeName);
+                    },
+                    child: Text(
+                      widget.index == 2 ? "DONE" : "SKIP",
+                      style: TextStyle(
+                          fontSize: 16,
+                          color: textColor,
+                          fontFamily: "SultanNahia"),
+                    ),
                   ))
             ],
           ),
@@ -116,9 +121,9 @@ class _AppItroState extends State<AppItro> {
                   width: MediaQuery.of(context).size.width),
               Center(
                   child: new Text(
-                    title[widget.index],
-                    style: TextStyle(fontFamily: "Caslon", fontSize: 30),
-                  )),
+                title[widget.index],
+                style: TextStyle(fontFamily: "Caslon", fontSize: 30),
+              )),
               Container(
                 margin: EdgeInsets.symmetric(horizontal: 24, vertical: 24),
                 child: Center(
@@ -160,9 +165,9 @@ class _AppItroState extends State<AppItro> {
                   top: widget.index != 2 ? 20 : 0,
                   child: widget.index != 2
                       ? Image.asset(
-                    'assets/images/arrow.png',
-                    width: 36,
-                  )
+                          'assets/images/arrow.png',
+                          width: 36,
+                        )
                       : LetsGo())
             ],
           ),
@@ -174,7 +179,9 @@ class _AppItroState extends State<AppItro> {
 
 class Dots extends StatefulWidget {
   int index;
+
   Dots(this.index);
+
   @override
   _DotsState createState() => _DotsState();
 }
@@ -218,9 +225,14 @@ class LetsGo extends StatelessWidget {
           Positioned(
               top: 16,
               left: 12,
-              child: Text(
-                "LET'S GO!",
-                style: TextStyle(color: Colors.white),
+              child: GestureDetector(
+                child: Text(
+                  "LET'S GO!",
+                  style: TextStyle(color: Colors.white),
+                ),
+                onTap: () {
+                  Navigator.of(context).pushNamed(Home.routeName);
+                },
               ))
         ],
       ),
