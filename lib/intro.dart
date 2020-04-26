@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 
+import 'home.dart';
+
 Color bgColor = Color(0xFFF3F3F3);
 Color textColor = Color(0xFF83838A);
 
@@ -39,30 +41,32 @@ class Intro extends StatelessWidget {
 class ContentPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Padding(
-        padding: EdgeInsets.only(top: 30),
-        child: Column(
-          children: <Widget>[
-            CarouselSlider(
-              autoPlay: false,
-              enableInfiniteScroll: false,
-              initialPage: 0,
-              reverse: false,
-              viewportFraction: 1.0,
-              aspectRatio: MediaQuery.of(context).size.aspectRatio,
-              height: MediaQuery.of(context).size.height - 30,
-              items: [0, 1, 2, 3].map((i) {
-                return Builder(
-                  builder: (BuildContext context) {
-                    return Container(
-                        width: MediaQuery.of(context).size.width,
-                        child: AppItro(i));
-                  },
-                );
-              }).toList(),
-            ),
-          ],
-        ));
+    return Scaffold(
+      body: Padding(
+          padding: EdgeInsets.only(top: 30),
+          child: Column(
+            children: <Widget>[
+              CarouselSlider(
+                autoPlay: false,
+                enableInfiniteScroll: false,
+                initialPage: 0,
+                reverse: false,
+                viewportFraction: 1.0,
+                aspectRatio: MediaQuery.of(context).size.aspectRatio,
+                height: MediaQuery.of(context).size.height - 30,
+                items: [0, 1, 2, 3].map((i) {
+                  return Builder(
+                    builder: (BuildContext context) {
+                      return Container(
+                          width: MediaQuery.of(context).size.width,
+                          child: AppItro(i));
+                    },
+                  );
+                }).toList(),
+              ),
+            ],
+          )),
+    );
   }
 }
 
@@ -101,12 +105,17 @@ class _AppItroState extends State<AppItro> {
               Positioned(
                   right: 24,
                   top: 14,
-                  child: new Text(
-                    widget.index == 3 ? "DONE" : "SKIP",
-                    style: TextStyle(
-                        fontSize: 16,
-                        color: textColor,
-                        fontFamily: "SultanNahia"),
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).pushNamed(Home.routeName);
+                    },
+                    child: Text(
+                      widget.index == 3 ? "DONE" : "SKIP",
+                      style: TextStyle(
+                          fontSize: 16,
+                          color: textColor,
+                          fontFamily: "SultanNahia"),
+                    ),
                   ))
             ],
           ),
@@ -222,9 +231,14 @@ class LetsGo extends StatelessWidget {
           Positioned(
               top: 16,
               left: 12,
-              child: Text(
-                "LET'S GO!",
-                style: TextStyle(color: Colors.white),
+              child: GestureDetector(
+                child: Text(
+                  "LET'S GO!",
+                  style: TextStyle(color: Colors.white),
+                ),
+                onTap: () {
+                  Navigator.of(context).pushNamed(Home.routeName);
+                },
               ))
         ],
       ),
