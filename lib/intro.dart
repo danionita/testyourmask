@@ -15,19 +15,19 @@ List<String> title = [
   "Calibrate the sensor",
   "Scan your mask"
 ];
-String welcomeString = "This app uses the optical sensor on the back of"
+String welcomeString = "This app uses the optical sensor on the back of "
     "your phone Samsung to estimate the quality of your face mask.";
 String page1String = "1. A dark or shaded area. \n"
     "2. A hard, black surface with as little gloss as possible.\n"
     "3. A Samsung Galaxy Note 4 (or newer) or Samsung Galaxy S6 (or newer).\n"
     "Remove its case for best results.";
-String page2String = "First calibrate the sensor by pressing the phone"
-    "face down on the black surface. \n"
-    "If calibration is not successful, the surface is too shiny, or you are"
+String page2String = "Place the phone "
+    "face down on the black surface and press slightly until the indicator becomes green. \n"
+    "If indicator is red, the surface is too shiny, or you are "
     "not pressing down hard enough.";
 String page3String =
     "Place the mask in-between the phone and the black surface.\n"
-    "The mask should always have the exterior towards the phone"
+    "The mask should always have the exterior towards the phone. \n"
     "Press the phone down using the same pressure used during calibration.\n"
     "Press the scan button and wait for the results";
 List<String> description = [
